@@ -1,4 +1,4 @@
-;;; ox-sb.el --- SB/SB BBCode Back-End for Org Export Engine -*- lexical-binding: t; -*-
+;;; ox-sb.el --- SB/SV BBCode Back-End for Org Export Engine -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2022  Ashlynn Anderson <contact@pea.sh>
 ;; Licensed under GNU GPL v3 or later.
@@ -30,18 +30,27 @@
 ;; This library implements a SpaceBattles/Sufficient Velocity BBCode
 ;; back-end for Org exporter.
 ;;
-;; ox-bb provides three different commands for export:
+;; ox-sb provides three different commands for export:
 ;;
-;; - `ox-sb-export-as-bbcode' exports to a buffer named "*Org BBCode
-;;   Export*" and automatically applies `bbcode-mode' if it is
+;; - `ox-sb-export-as-bbcode' exports to a buffer named "*Org SB
+;;   BBCode Export*" and automatically applies `bbcode-mode' if it is
 ;;   available.
 ;;
 ;; - `ox-sb-export-to-kill-ring' does the same and additionally copies
 ;;   the exported buffer to the kill ring so that the generated BBCode
-;;   is available in the Clipboard.
+;;   is available in the clipboard.
 ;;
 ;; - `ox-sb-export-to-bbcode' exports to a file with extension
-;;   ".bbcode".
+;;   ".bbcode". As far as I'm aware there's no actual file extension
+;;   associated with BBCode, so its name is simply used as a
+;;   placeholder.
+;;
+;; It's of note that this code is primarily for personal use, rather
+;; than for general consumption. As such it will be opinionated in its
+;; decisions. If you wish to use this code yourself you will be
+;; expected to either live with those opinionated decisions or do your
+;; own tweaking, and it is only published for the sake of sharing code
+;; that may be useful to others.
 
 ;;; Code:
 
@@ -123,19 +132,13 @@
 
 (defun ox-sb--format-headline (text level)
   "Format TEXT as a headline of the given LEVEL."
-  (let ((indent (cl-case level
-		  (0 "")
-		  (1 "# ")
-		  (2 "== ")
-		  (3 "+++ ")
-		  (4 ":::: ")
-		  (5 "----- ")
-		  (t (user-error "Headline level `%s' is not defined yet" level)))))
+  (let ((indent (make-string level ?•)))
     (concat
+     "\n"
      (ox-sb--put-in-tag
       "b" (ox-sb--put-in-tag
-	   "u" (concat indent text)))
-     "\n\n")))
+	   "u" (concat indent " " text)))
+     "\n")))
 
 (defun ox-sb--put-in-tag (tag contents &optional attributes)
   "Puts the BBcode tag TAG around the CONTENTS string.
@@ -411,7 +414,7 @@ CONTENTS is nil.  INFO is a plist used as a communication channel."
 ;;;###autoload
 (defun ox-sb-export-as-bbcode
     (&optional async subtreep visible-only body-only ext-plist)
-  "Export current buffer to a BBCode buffer.
+  "Export current buffer to a SB BBCode buffer.
 
 If narrowing is active in the current buffer, only export its
 narrowed part.
@@ -435,7 +438,7 @@ EXT-PLIST, when provided, is a property list with external
 parameters overriding Org default settings, but still inferior to
 file-local settings.
 
-Export is done in a buffer named \"*Org BBCode Export*\".  If
+Export is done in a buffer named \"*Org SB BBCode Export*\".  If
 available, `bbcode-mode' is enabled in the buffer."
   (interactive)
   (org-export-to-buffer 'sb "*Org SB BBCode Export*"
