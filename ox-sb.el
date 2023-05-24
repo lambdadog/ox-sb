@@ -132,12 +132,11 @@
 
 (defun ox-sb--format-headline (text level)
   "Format TEXT as a headline of the given LEVEL."
-  (let ((indent (make-string level ?•)))
+  (let ((indent (make-string level ?=)))
     (concat
-     "\n"
      (ox-sb--put-in-tag
       "b" (ox-sb--put-in-tag
-	   "u" (concat indent " " text)))
+	   "u" (concat indent " " text " " indent)))
      "\n")))
 
 (defun ox-sb--put-in-tag (tag contents &optional attributes)
